@@ -9,8 +9,9 @@ env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: girish-repository
   ECS_CLUSTER: girish-cluster
-  # Updated with your specific AWS names
+  # Corrected Service Name
   ECS_SERVICE: girish-definition-service-
+  # Corrected Task Definition Family Name
   ECS_TASK_DEFINITION: girish-definition 
   NODE_ENV: test
 
@@ -38,7 +39,6 @@ jobs:
         run: pnpm install
 
       - name: Run tests
-        # Added timeout variable to prevent MongoDB download errors
         env:
           MONGOMS_DOWNLOAD_TIMEOUT: 300000 
         run: pnpm test
@@ -71,22 +71,4 @@ jobs:
 
       - name: Download task definition
         run: |
-          aws ecs describe-task-definition --task-definition ${{ env.ECS_TASK_DEFINITION }} \
-          --query taskDefinition > task-definition.json
-
-      - name: Update ECS task definition
-        id: task-def
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: task-definition.json
-          # Ensure this name matches the container name in your AWS Console
-          container-name: girish-definition 
-          image: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-
-      - name: Deploy to Amazon ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
-        with:
-          task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ env.ECS_SERVICE }}
-          cluster: ${{ env.ECS_CLUSTER }}
-          wait-for-service-stability: true
+          aws ecs describe-task-
