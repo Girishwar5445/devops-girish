@@ -37,10 +37,10 @@ jobs:
         run: pnpm install
 
       - name: Run tests
-        # This section fixes the MongoDB error by preventing parallel downloads
         env:
           MONGOMS_DOWNLOAD_TIMEOUT: 300000 
-        run: pnpm test -- --runInBand
+        # Correct Vitest 3.x syntax: 'run' must come first
+        run: pnpm vitest run --file-parallelism=false
 
   deploy:
     needs: test
