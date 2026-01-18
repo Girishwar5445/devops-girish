@@ -9,8 +9,9 @@ env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: girish-repository
   ECS_CLUSTER: girish-cluster
+  # Updated with your specific AWS names
   ECS_SERVICE: girish-definition-service-
-  ECS_TASK_DEFINITION: girish-definition
+  ECS_TASK_DEFINITION: girish-definition 
   NODE_ENV: test
 
 jobs:
@@ -18,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4 # Updated to v4
+        uses: actions/checkout@v4
 
       - name: Install pnpm
         uses: pnpm/action-setup@v2
@@ -27,7 +28,7 @@ jobs:
           run_install: false
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4 # Updated to v4
+        uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "pnpm"
@@ -37,6 +38,9 @@ jobs:
         run: pnpm install
 
       - name: Run tests
+        # Added timeout variable to prevent MongoDB download errors
+        env:
+          MONGOMS_DOWNLOAD_TIMEOUT: 300000 
         run: pnpm test
 
   deploy:
@@ -45,10 +49,10 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4 # Updated to v4
+        uses: actions/checkout@v4
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4 # Updated to v4
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -56,7 +60,7 @@ jobs:
 
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2 # Updated to v2
+        uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and push backend image
         env:
@@ -75,15 +79,14 @@ jobs:
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task-definition.json
-          container-name: girish-definition
+          # Ensure this name matches the container name in your AWS Console
+          container-name: girish-definition 
           image: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
 
       - name: Deploy to Amazon ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v2 # Updated to v2
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
-
-          #test
