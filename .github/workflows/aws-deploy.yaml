@@ -10,7 +10,7 @@ env:
   ECR_REPOSITORY: girish-repository
   ECS_CLUSTER: girish-cluster
   ECS_SERVICE: girish-service
-  ECS_TASK_DEFINITION: girish-task-definition-
+  ECS_TASK_DEFINITION: girish-definition-service-
   NODE_ENV: test
 
 jobs:
